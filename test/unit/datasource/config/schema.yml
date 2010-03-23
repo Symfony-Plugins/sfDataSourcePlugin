@@ -1,0 +1,6 @@
+propel:
+  _attributes:
+    package: lib.model
+  person:
+    id:   { type: INTEGER, size: '10', primaryKey: true, autoIncrement: true, required: true }
+    naam: { type: VARCHAR, size: '255', required: true }

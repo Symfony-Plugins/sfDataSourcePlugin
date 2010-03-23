@@ -1,0 +1,119 @@
+INTRODUCTION
+============
+
+This plugin allows to read various data sources in a unified way. These data sources can be filtered and sorted in a generic way, 
+so they can for example be be rendered in a customizable grid.
+
+Currently arrays, Propel (1.5 supported, but also 1.3 although unsupported) and Doctrine tables can be used as data sources,
+You are however free to add more implementations, for example to process csv or xml data. Provided is also an imap implementation,
+but this is also unsupported.
+
+
+Installation
+============
+
+Propel 1.5
+----------
+
+For propel 1.5 a new implementation of sfDataSourcePropel has been implemented. 
+This implementation currently depends on the sfPropelObjectPathBehaviorPlugin for Propel 1.5, although I 
+can make it possible to work without it (with some functional limitations of course, since the behavior is missing).
+
+Simply install the sfPropelObjectPathBehaviorPlugin plugin and you are good to go!
+
+
+## Example Schema.yml ##
+
+So far the difficult part. Now you are ready to make use of the sfDataSourcePropel class. 
+
+For the following schema.yml:
+
+    [yml]
+    propel:
+      album:
+        id:
+        album_id:
+        map:          varchar(255)
+        title:        varchar(255)
+        description:  LONGVARCHAR
+      photo:
+        id:
+        album_id:
+        filename:     varchar(255)
+        title:        varchar(255)
+        description:  LONGVARCHAR
+
+
+
+
+Propel 1.3 (maybe even 1.2)
+---------------------------
+
+Although not maintained anymore, there is also an implementation for Propel1.3. You are advised to upgrade to Propel 1.5 though!
+
+sfDataSourcePropel 1.3 makes use of the sfPropelHelperPlugin: a helper that provides support for object- and propertyPaths to
+Propel 1.3, to make joining and hydrating easier. 
+
+Since Propel 1.3 does not have support for relations in the schema, the relations are defined and in your 
+basePeer-classes (::getRelations()) and can be modified in your Peer to your needs. 
+
+*NOTE: be sure to have connection pooling enabled for your propel 1.3 database (in your database.yml) or else you will get more results than desired with right-joins (one-to-many relations)*
+ 
+
+Doctrine
+--------
+
+TODO: explain
+
+Note: Doctrine currently doesn't have an objectPath behavior, so the handling of relations is limited 
+
+Array
+-----
+
+installation for handling arrays is easy. This works out of the box.
+
+
+HowTo
+=====
+
+You can setup a sfDataSourcePropel like this:
+
+    [php]
+    $dataSource = new sfDataSourcePropel('City');
+    $dataSource->requireColumn('Country.Name');
+    $dataSource->setSort('Country.Name', sfDataSource::ASC); // first sort on country name
+    $dataSource->setSort('Name', sfDataSource::ASC);         // then sort on city name
+  
+    echo "Number of results: ".count($dataSource)."\n";
+    foreach ($dataSource as $city)
+    {
+	    echo "City: ".$city->getName().", in Country: ".$city->getCountry()->getName()."\n";
+    }
+	  
+
+TODO: show more difficult schema's and relations
+
+The real bennefit of the sfDataSource will show up when used with the sfGrid(Plugin). 
+RequireColumn is called automatically when you select columns for your grid, which in its turn will automatically join
+related tables. Sorting on foreign fields or filtering on any table is now easy, because the model is aware of the relations. 
+
+
+TODO:
+----
+
+Show how to extend DataSourcePropel per class, E.G. DataSourcePropelCity 
+This way you can for example define your custom sort and filter methods.
+
+Show more capabilities, like array-access to access fields 
+ 
+
+Note
+====
+
+The sfDataSourcePlugin is used in the sfGridPlugin.
+
+
+LICENSE
+=======
+
+see LICENSE file

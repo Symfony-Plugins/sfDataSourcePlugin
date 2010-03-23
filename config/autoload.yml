@@ -1,0 +1,5 @@
+autoload:
+  sfDataSourcePlugin_lib:
+    name:           DataSource libs
+    path:           <?php echo realpath(dirname(__FILE__).'/../lib')."\n" ?>
+    recursive:      true
