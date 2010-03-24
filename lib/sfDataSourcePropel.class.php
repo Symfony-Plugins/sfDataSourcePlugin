@@ -240,15 +240,15 @@ class sfDataSourcePropel extends sfDataSource
    */
   public function count()
   {
-    if ($this->query)
+    // count (to be) loaded data
+    // else number of count-queries would be enormous, while the result would be the same
+    if (!$this->isDataLoaded())
     {
-      $count = $this->query->count();
-    }
-    else
-    {
-      $count = count($this->data);
+      $this->loadData();
     }
 
+    $count = count($this->data);
+    
     // if this object has been initialized with a PropelCollection, we need
     // to subtract the offset from the object count manually
     if (!$this->query)
