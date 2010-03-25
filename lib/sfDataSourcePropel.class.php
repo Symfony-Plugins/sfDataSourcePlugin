@@ -385,9 +385,31 @@ class sfDataSourcePropel extends sfDataSource
   /**
    * @see sfDataSourceInterface
    */
-  public function setFilter($fields)
+  // TODO: remove Criteria dependancy
+  public function addFilter($column, $value, $comparison = Criteria::EQUAL)
   {
-    throw new Exception('This method has not been implemented yet');
+    $this->requireColumn($column);
+
+    $query = $this->query;
+    
+    // is you have a query object
+    if ($this->query)
+    {
+      // check if an objectPath has been given
+      $lastDot = strrpos($column, '.');
+      if ($lastDot !== false)
+      {
+        // get the objectPath
+        $objectPath = substr($column, 0, $lastDot);
+        
+        // and get Related Query Class
+        $strRelated = $query->translateObjectPathToAlias($objectPath);
+        $query = $query->useQuery($strRelated);
+        $column = substr($column, $lastDot + 1);
+      }
+    }
+    
+    $query->filterBy($column, $value, $comparison); 
   }
 
 }
