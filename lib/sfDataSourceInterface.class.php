@@ -111,7 +111,7 @@ interface sfDataSourceInterface extends SeekableIterator, ArrayAccess, Countable
    *
    * @param array[array[string, string]] $columns
    */
-  public function addFilter($column, $value, $comparison = Criteria::EQUAL);
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL);
 
   /**
    * Sets the number of rows to skip in the beginning of the data source when

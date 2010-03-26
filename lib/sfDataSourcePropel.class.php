@@ -12,8 +12,7 @@
  * This class implements the interface sfDataSourceInterface for accessing
  * data stored in Propel (1.5) tables.
  *
- * You can either pass a model name, an instance of PropelModelQuery 
- * TODO: instance of PropelCollection to the constructor.
+ * You can either pass a model name or an instance of PropelModelQuery 
  *
  * <code>
  * // fetches all user objects
@@ -23,15 +22,9 @@
  * $q = PropelQuery::from('User')->where('id BETWEEN ? AND ?', array(1, 100));
  * $source = new sfDataSourcePropel($q);
  *
- * // uses the objects in the given collection
- * $coll = PropelQuery::from('User')->find();
- * $source = new sfDataSourcePropel($coll);
  * </code>
  *
- * This class will work the same way no matter how you instantiate it. Most of the
- * time, however, it is better to base the source on a model name or on a
- * PropelModelQuery, because sorting and limiting result sets is more efficient
- * when done by the database than when done by Php.
+ * This class will work the same way no matter how you instantiate it. 
  *
  * You can iterate the data source like any other data source. If you iterate
  * this class with foreach, the current row will always be an instance of
@@ -64,7 +57,7 @@ class sfDataSourcePropel extends sfDataSource
 	 * 
 	 * @var ObjectPathCriteria
 	 */
-  public
+  protected
     $query    = null;
     
   /**
@@ -77,9 +70,9 @@ class sfDataSourcePropel extends sfDataSource
   /**
    * Constructor.
    *
-   * The dataSourcePropel (1.5) can be given string, as instance of PropelModelQuery or as
-   * instance of PropelCollection.  If you pass in a PropelModelQuery, the
-   * object will be cloned because it needs to be modified internally.
+   * The dataSourcePropel (1.5) can be given string or as instance of PropelModelQuery
+   * If you pass an instance of PropelModelQuery, the object will be cloned because 
+   * it needs to be modified internally.
    *
    * <code>
    * // fetches all user objects
@@ -88,10 +81,6 @@ class sfDataSourcePropel extends sfDataSource
    * // fetches user objects with IDs 1 to 100
    * $q = PropelQuery::from('User')->where('id BETWEEN ? AND ?', array(1, 100));
    * $source = new sfDataSourcePropel($q);
-   *
-   * // uses the objects in the given collection
-   * $coll = PropelQuery::from('User')->find();
-   * $source = new sfDataSourcePropel($coll);
    * </code>
    *
    * @param  mixed $source             The propel source as described above
@@ -129,11 +118,6 @@ class sfDataSourcePropel extends sfDataSource
     {
       $this->query = clone $source;
     }
-    // ... and there is support for PropelCollection result-sets (TODO: although not fully implemented yet)
-    elseif ($source instanceof PropelCollection)
-    {
-      $this->data = $source;
-    }
     else
     {
       throw new InvalidArgumentException('The source must be an instance of ObjectPathCriteria, PropelCollection or a record class name');
@@ -168,12 +152,12 @@ class sfDataSourcePropel extends sfDataSource
    */
   public function offsetGet($field)
   {
+    $obj = $this->current();
     $accessors = explode('.', $field);
     
-    $obj = $this->current();
     foreach ($accessors as $accessor)
     {
-      $method = 'get'.$accessor; //TODO: ucfirst? // TODO: move to sfPropelObjectPathBehaviorPlugin?
+      $method = 'get'.$accessor; //TODO: maybe move to sfPropelObjectPathBehaviorPlugin? object->getValueByPropertyPath($field)...
       $obj = $obj->$method();
     }
     
@@ -289,21 +273,17 @@ class sfDataSourcePropel extends sfDataSource
    */
   public function requireColumn($column)
   {
-    // is you have a query object
-    if ($this->query)
+    // check if an objectPath has been given
+    $lastDot = strrpos($column, '.');
+    if ($lastDot !== false)
     {
-      // check if an objectPath has been given
-      $lastDot = strrpos($column, '.');
-      if ($lastDot !== false)
-      {
-        // get the objectPath
-        $objectPath = substr($column, 0, $lastDot);
-        
-        // and join accordingly
-        $this->query->joinByObjectPath($objectPath);
-      }
+      // get the objectPath
+      $objectPath = substr($column, 0, $lastDot);
+      
+      // and join accordingly
+      $this->query->joinByObjectPath($objectPath);
     }
-    // TODO: in no query-object is used
+
   }
 
   /**
@@ -385,31 +365,11 @@ class sfDataSourcePropel extends sfDataSource
   /**
    * @see sfDataSourceInterface
    */
-  // TODO: remove Criteria dependancy
-  public function addFilter($column, $value, $comparison = Criteria::EQUAL)
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
   {
     $this->requireColumn($column);
 
-    $query = $this->query;
-    
-    // is you have a query object
-    if ($this->query)
-    {
-      // check if an objectPath has been given
-      $lastDot = strrpos($column, '.');
-      if ($lastDot !== false)
-      {
-        // get the objectPath
-        $objectPath = substr($column, 0, $lastDot);
-        
-        // and get Related Query Class
-        $strRelated = $query->translateObjectPathToAlias($objectPath);
-        $query = $query->useQuery($strRelated);
-        $column = substr($column, $lastDot + 1);
-      }
-    }
-    
-    $query->filterBy($column, $value, $comparison); 
+    return $this->query->filterBy($column, $value, $comparison);
   }
 
 }

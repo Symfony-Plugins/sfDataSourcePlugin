@@ -50,7 +50,7 @@ class sfDataSourceArray extends sfDataSource
     $data = array(),
     $originalData = array();
 
-  private
+  protected
     $sortColumn = null,
     $sortOrder = null;
 
@@ -216,26 +216,22 @@ class sfDataSourceArray extends sfDataSource
   /**
    * @see sfDataSourceInterface
    */
-  public function setFilter($fields)
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
   {
     // TODO: because of this, you should first Filter before you sort!
     // TODO: possibly add sortState (asc,desc, none (per field)), and sort after filtering 
     $this->data = array();
     
-    foreach ($fields as $columnName => $column)
+    $this->requireColumn($columnName);
+
+    if (!isset($column['value']))
     {
-      $this->requireColumn($columnName);
-
-      if (!isset($column['value']))
-      {
-        throw new Exception("key 'value' not set for filter on column ".$columnName);
-      }
-
-      $value = $column['value'];
-      $operator =  isset($column['operator']) ? $column['operator'] : sfDataSource::EQUAL;
-
-      $this->data = array_filter($this->originalData, array($this, 'filterCallback'));
+      throw new Exception("key 'value' not set for filter on column ".$columnName);
     }
+
+    $value = $column['value'];
+
+    $this->data = array_filter($this->originalData, array($this, 'filterCallback'));
   }
 
   //TODO: implement filtering on an array
