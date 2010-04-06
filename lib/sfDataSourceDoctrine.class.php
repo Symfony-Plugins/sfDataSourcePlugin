@@ -61,8 +61,8 @@
 class sfDataSourceDoctrine extends sfDataSource
 {
   protected
-    $query    = null,
-    $data     = null;
+  $query    = null,
+  $data     = null;
 
   /**
    * Constructor.
@@ -158,7 +158,16 @@ class sfDataSourceDoctrine extends sfDataSource
    */
   public function offsetGet($field)
   {
-    return $this->current()->get($field);
+    $obj = $this->current();
+    $accessors = explode('.', $field);
+
+    foreach ($accessors as $accessor)
+    {
+      $method = 'get'.$accessor; //TODO: maybe move to ObjectPath Plugin? object->getValueByPropertyPath($field)...
+      $obj = $obj->$method();
+    }
+
+    return $obj;
   }
 
   /**
@@ -243,7 +252,20 @@ class sfDataSourceDoctrine extends sfDataSource
    */
   public function requireColumn($column)
   {
-    if (!$this->getTable()->hasColumn($column))
+    // check if an objectPath has been given
+    $lastDot = strrpos($column, '.');
+    if ($lastDot !== false)
+    {
+      // get the objectPath
+      $objectPath = substr($column, 0, $lastDot);
+
+      // and join accordingly
+      $this->query->joinByObjectPath($objectPath);
+
+      //TODO: if we don't have sfAlyssaDoctrineObjectPathPlugin installed?
+    }
+    // check if the given column is valid
+    elseif(!$this->getTable()->hasColumn($column))
     {
       throw new LogicException(sprintf('The column "%s" has not been defined in the datasource', $column));
     }
@@ -307,17 +329,19 @@ class sfDataSourceDoctrine extends sfDataSource
       throw new RuntimeException('A data source based on a Doctrine_Collection cannot be sorted');
     }
 
-    $this->query->orderBy($column.' '.strtoupper($order));
+    $this->query->orderByProperyPath($column.' '.strtoupper($order));
     $this->refresh();
   }
-
 
   /**
    * @see sfDataSourceInterface
    */
-  public function setFilter($fields)
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
   {
-    throw new Exception('This method has not been implemented yet');
+    $this->requireColumn($column);
+
+    $expr = $column.' '.$comparison.' ?';
+    return $this->query->addWhereProperyPath($expr, $value);
   }
 
   /**
