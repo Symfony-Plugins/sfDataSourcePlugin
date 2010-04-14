@@ -39,6 +39,11 @@ class sfDataSourceTest extends sfDataSource
     $this->sortOrder = $order;
   }
 
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
+  {
+    throw new Exception('This method has not been implemented yet');
+  }
+  
   public function current() {}
   public function offsetGet($key) {}
   public function count() {}

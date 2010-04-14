@@ -170,11 +170,15 @@ class sfDataSourceArray extends sfDataSource
   }
 
   /**
+   * requireColumn checks if the source contains the desired column.
+   * If the source is an empty array, any column will be accepted, since 
+   * the DataSource doesn't have any model-data to base its decision on
+   * 
    * @see sfDataSourceInterface::requireColumn()
    */
   public function requireColumn($column)
   {
-    if (!($this->count()>0 && array_key_exists($column, $this->data[0])))
+    if (($this->count() != 0 && !array_key_exists($column, current($this->data))))
     {
       throw new LogicException(sprintf('The column "%s" has not been defined in the datasource', $column));
     }

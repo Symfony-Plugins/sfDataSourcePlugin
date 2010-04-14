@@ -26,6 +26,15 @@ $autoload->addDirectory(realpath($_SERVER['SYMFONY'].'/plugins/sfDoctrinePlugin/
 $autoload->register();
 
 //class ProjectConfiguration extends sfProjectConfiguration {}
+class ProjectConfiguration extends sfProjectConfiguration
+{
+//  protected $plugins = array('sfPropel15Plugin');
+  
+  public function setup()
+  {
+    $this->setPluginPath('sfDoctrinePlugin', dirname(__FILE__).'/../../../../sfPropel15Plugin');
+  }
+}
 
 $configuration = new ProjectConfiguration(dirname(__FILE__).'/../../lib', new sfEventDispatcher());
 $database = new sfDoctrineDatabase(array('name' => 'doctrine', 'dsn' => 'sqlite::memory:'));

@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(32, new lime_output_color());
+$t = new lime_test(37, new lime_output_color());
 
 $data = array(
   array('id' => 1, 'name' => 'Fabien'),
@@ -64,6 +64,30 @@ catch (InvalidArgumentException $e)
 {
   $t->pass('->__construct() throws an "InvalidArgumentException" if the array entries are not arrays');
 }
+
+
+$t->diag('->requireColumn()');
+$s = new sfDataSourceArray($data);
+try
+{
+  $s->requireColumn('name');
+  $t->pass('sfDataSourceArray accepts existing column (name) of an array');
+}
+catch (Exception $e)
+{
+  $t->fail('sfDataSourceArray accepts existing column (name) of an array');
+}
+
+try
+{
+  $s->requireColumn('anyColumn');
+  $t->fail('sfDataSourceArray does not accept columns that are not in the array');
+}
+catch (LogicException $e)
+{
+  $t->pass('sfDataSourceArray does not accept columns that are not in the array');
+}
+
 
 // SeekableIterator interface
 $t->diag('SeekableIterator interface');
@@ -216,3 +240,35 @@ $values = array();
 foreach ($s as $row) { $values[] = $s['name']; }
 sort($originalValues);
 $t->is($values, $originalValues, '->setSort() sorts correctly');
+
+
+
+
+// support for empty arrays
+$t->diag('support for empty arrays');
+
+$data_empty = array();
+$s = new sfDataSourceArray($data_empty);
+
+$t->is(count($s), 0, 'sfDataSourceArray accepts empty array');
+
+try
+{
+  $s->requireColumn('anyColumn');
+  $t->pass('sfDataSourceArray accepts any column when an empty array is provided');
+}
+catch (Exception $e)
+{
+  $t->fail('sfDataSourceArray accepts any column when an empty array is provided');
+}
+
+try
+{
+  $s['name'];
+  $t->fail('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
+}
+catch (OutOfBoundsException $e)
+{
+  $t->pass('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
+}
+

@@ -343,10 +343,12 @@ rsort($originalValues);
 $t->is(iterator_to_field_array($s, 'Name'), $originalValues, '->setSort() sorts correctly');
 
 $s = new sfDataSourcePropel('City');
-$s->setSort('Name', sfDataSourceInterface::DESC); // you cannot sort on the same field twice, this is different from other implementations 
+// TODO: sorting on the same column twice will result in first sorting on first column, than on the second (which will be ineffective)
+// is this desired?
+$s->setSort('Name', sfDataSourceInterface::DESC);  
 $s->setSort('Name', sfDataSourceInterface::ASC);
 sort($originalValues);
-$t->is(iterator_to_field_array($s, 'Name'), $originalValues, '->setSort() sorts correctly');
+$t->is(array_reverse(iterator_to_field_array($s, 'Name')), $originalValues, '->setSort() sorts correctly, or isn\'t it?');
 
 
 $byCountryValues = array(

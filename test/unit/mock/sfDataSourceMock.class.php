@@ -80,7 +80,7 @@ class sfDataSourceMock extends ArrayIterator implements sfDataSourceInterface
   /**
    * @see sfDataSourceInterface
    */
-  public function setFilter($fields)
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
   {
     throw new Exception('This method has not been implemented yet');
   }
