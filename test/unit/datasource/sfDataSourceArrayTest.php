@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(37, new lime_output_color());
+$t = new lime_test(57, new lime_output_color());
 
 $data = array(
   array('id' => 1, 'name' => 'Fabien'),
@@ -28,7 +28,7 @@ $t->diag('->__construct()');
 try
 {
   new sfDataSourceArray(array(
-	  array('id' => 1, 'name' => 'Fabien'), 
+	  array('id' => 1, 'name' => 'Fabien'),
 	  array('id' => 2, 'surname' => 'Stefan'),
 	  array('id' => 3, 'name' => 'Jonathan'),
   ));
@@ -41,7 +41,7 @@ catch (InvalidArgumentException $e)
 try
 {
   new sfDataSourceArray(array(
-    'id' => 1, 'name' => 'Fabien', 
+    'id' => 1, 'name' => 'Fabien',
     'id' => 2, 'surname' => 'Stefan',
     'id' => 3, 'name' => 'Jonathan',
   ));
@@ -54,7 +54,7 @@ catch (InvalidArgumentException $e)
 try
 {
   new sfDataSourceArray(array(
-    array('id' => 1, 'name' => 'Fabien'), 
+    array('id' => 1, 'name' => 'Fabien'),
     'id' => 2, 'surname' => 'Stefan',
     'id' => 3, 'name' => 'Jonathan',
   ));
@@ -272,3 +272,120 @@ catch (OutOfBoundsException $e)
   $t->pass('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
 }
 
+
+// associative arrays
+$t->diag('support for associative arrays');
+
+$associative_data = array(
+  'first'  => array('id' => 1, 'name' => 'Fabien'),
+  'second' => array('id' => 2, 'name' => 'Francois'),
+  'third'  => array('id' => 3, 'name' => 'Jonathan'),
+);
+$s = new sfDataSourceArray($associative_data);
+try
+{
+  $s->requireColumn('name');
+  $t->pass('sfDataSourceArray accepts existing column (name) of an array');
+}
+catch (Exception $e)
+{
+  $t->fail('sfDataSourceArray accepts existing column (name) of an array');
+}
+try
+{
+  $s->requireColumn('anyColumn');
+  $t->fail('sfDataSourceArray does not accept columns that are not in the array');
+}
+catch (LogicException $e)
+{
+  $t->pass('sfDataSourceArray does not accept columns that are not in the array');
+}
+
+$t->is(array_keys(iterator_to_array($s, true)), range(0, 2), 'sfDataSourceArray implements the SeekableIterator interface');
+$t->is(count(iterator_to_array($s)), 3, 'sfDataSourceArray implements the SeekableIterator interface');
+
+$s->seek(1);
+$t->is($s['id'], 2, 'sfDataSourceArray implements the SeekableIterator interface');
+$t->is($s['name'], 'Francois', 'sfDataSourceArray implements the SeekableIterator interface');
+
+try
+{
+  $s->seek(30);
+  $t->fail('->seek() throws an "OutOfBoundsException" when the given index is too large');
+}
+catch (OutOfBoundsException $e)
+{
+  $t->pass('->seek() throws an "OutOfBoundsException" when the given index is too large');
+}
+
+try
+{
+  $s->seek(-1);
+  $t->fail('->seek() throws an "OutOfBoundsException" when the given index is too small');
+}
+catch (OutOfBoundsException $e)
+{
+  $t->pass('->seek() throws an "OutOfBoundsException" when the given index is too small');
+}
+$t->is(count($s), 3, 'sfDataSourceArray implements the Countable interface');
+
+
+$s = new sfDataSourceArray($associative_data);
+$s->setLimit(3);
+$values = array();
+foreach ($s as $row)
+{
+  $values[] = $row['id'];
+}
+$t->is($values, range(1,3), '->setLimit() limits the records returned by the iterator');
+
+
+$s = new sfDataSourceArray($associative_data);
+
+$t->is($s['id'], 1, 'sfDataSourceArray implements the ArrayAccess interface');
+$t->is($s['name'], 'Fabien', 'sfDataSourceArray implements the ArrayAccess interface');
+$t->ok(isset($s['id']), 'sfDataSourceArray implements the ArrayAccess interface');
+$t->ok(!isset($s['foobar']), 'sfDataSourceArray implements the ArrayAccess interface');
+$s->next();
+$t->is($s['id'], 2, 'sfDataSourceArray implements the ArrayAccess interface');
+$t->is($s['name'], 'Francois', 'sfDataSourceArray implements the ArrayAccess interface');
+
+try
+{
+  $s['name'] = 'Foobar';
+  $t->fail('sfDataSourceArray throws a "LogicException" when fields are set using ArrayAccess');
+}
+catch (LogicException $e)
+{
+  $t->pass('sfDataSourceArray throws a "LogicException" when fields are set using ArrayAccess');
+}
+try
+{
+  unset($s['name']);
+  $t->fail('sfDataSourceArray throws a "LogicException" when fields are unset using ArrayAccess');
+}
+catch (LogicException $e)
+{
+  $t->pass('sfDataSourceArray throws a "LogicException" when fields are unset using ArrayAccess');
+}
+
+foreach ($s as $k => $v);
+
+try
+{
+  $s['name'];
+  $t->fail('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
+}
+catch (OutOfBoundsException $e)
+{
+  $t->pass('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
+}
+try
+{
+  isset($s['name']);
+  $t->fail('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
+}
+catch (OutOfBoundsException $e)
+{
+  $t->pass('sfDataSourceArray throws an "OutOfBoundsException" when fields are accessed after iterating');
+}

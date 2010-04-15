@@ -2,9 +2,9 @@ INTRODUCTION
 ============
 
 This plugin allows to read various data sources in a unified way. These data sources can be filtered and sorted in a generic way, 
-so they can for example be be rendered in a customizable grid.
+so they can for example be rendered in a customizable grid.
 
-Currently arrays, Propel (1.5 supported, but also 1.3 although unsupported) and Doctrine tables can be used as data sources,
+Currently arrays (simple and associative), Propel (1.5 supported, but also 1.3 although unsupported) and Doctrine tables can be used as data sources,
 You are however free to add more implementations, for example to process csv or xml data. Provided is also an imap implementation,
 but this is also unsupported.
 
@@ -63,9 +63,11 @@ basePeer-classes (::getRelations()) and can be modified in your Peer to your nee
 Doctrine
 --------
 
-TODO: explain
+The use of Doctrine is similar that with with Propel. If you like ObjectPaths, you can optionally install the 
+plugin [sfAlyssaDoctrineObjectPath](http://www.symfony-project.org/plugins/sfAlyssaDoctrineObjectPathPlugin) that 
+brings the same feature that sfPropelObjectPathBehaviorPlugin.
 
-Note: Doctrine currently doesn't have an objectPath behavior, so the handling of relations is limited 
+
 
 Array
 -----
@@ -93,7 +95,7 @@ You can setup a sfDataSourcePropel like this:
 
 TODO: show more difficult schema's and relations
 
-The real bennefit of the sfDataSource will show up when used with the sfGrid(Plugin). 
+The real benefit of the sfDataSource will show up when used with the sfGrid(Plugin). 
 RequireColumn is called automatically when you select columns for your grid, which in its turn will automatically join
 related tables. Sorting on foreign fields or filtering on any table is now easy, because the model is aware of the relations. 
 

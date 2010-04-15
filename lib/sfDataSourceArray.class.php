@@ -106,7 +106,7 @@ class sfDataSourceArray extends sfDataSource
 
     $this->originalData = $data;
     $this->data = $this->originalData;
-    
+
   }
 
   /**
@@ -124,7 +124,10 @@ class sfDataSourceArray extends sfDataSource
       throw new OutOfBoundsException(sprintf('The result with index %s does not exist', $this->key()));
     }
 
-    return $this->data[$this->key()+$this->getOffset()];
+    // we do this to support associative arrays
+    $keys = array_keys($this->data);
+
+    return $this->data[$keys[$this->key()+$this->getOffset()]];
   }
 
   /**
@@ -171,9 +174,9 @@ class sfDataSourceArray extends sfDataSource
 
   /**
    * requireColumn checks if the source contains the desired column.
-   * If the source is an empty array, any column will be accepted, since 
+   * If the source is an empty array, any column will be accepted, since
    * the DataSource doesn't have any model-data to base its decision on
-   * 
+   *
    * @see sfDataSourceInterface::requireColumn()
    */
   public function requireColumn($column)
@@ -194,7 +197,7 @@ class sfDataSourceArray extends sfDataSource
 
     usort($this->data, array($this, 'sortCallback'));
   }
-  
+
   /**
    * Callback method used by usort(). Compares two arrays by the current
    * sort column in the given sort order.
@@ -216,16 +219,16 @@ class sfDataSourceArray extends sfDataSource
       return strcmp($b[$this->sortColumn], $a[$this->sortColumn]);
     }
   }
-  
+
   /**
    * @see sfDataSourceInterface
    */
   public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
   {
     // TODO: because of this, you should first Filter before you sort!
-    // TODO: possibly add sortState (asc,desc, none (per field)), and sort after filtering 
+    // TODO: possibly add sortState (asc,desc, none (per field)), and sort after filtering
     $this->data = array();
-    
+
     $this->requireColumn($columnName);
 
     if (!isset($column['value']))
@@ -240,8 +243,8 @@ class sfDataSourceArray extends sfDataSource
 
   //TODO: implement filtering on an array
   protected function filterCallback($row)
-  {  
+  {
     throw new Exception('This method has not been finished yet');
   }
-    
+
 }
