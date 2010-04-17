@@ -226,7 +226,7 @@ class sfDataSourcePager implements Iterator
    */
   public function setPage($page)
   {
-    $this->page = $page;
+    $this->page = (int) $page;
   }
 
   /**

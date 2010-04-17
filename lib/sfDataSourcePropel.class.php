@@ -350,17 +350,6 @@ class sfDataSourcePropel extends sfDataSource
     $this->refresh();
   }
   
-  /**
-   * @see sfDataSource::doSort()
-   */  
-  public function setSort($column, $order = sfDataSourceInterface::ASC)
-  {
-    // add the Join, if required
-    $this->requireColumn($column);
-    
-    return parent::setSort($column, $order);
-  }
-
 
   /**
    * @see sfDataSourceInterface
