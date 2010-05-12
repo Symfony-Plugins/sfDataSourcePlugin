@@ -61,7 +61,7 @@
  * @author     Bernhard Schussek <bschussek@gmail.com>
  * @version    SVN: $Id$
  */
-interface sfDataSourceInterface extends SeekableIterator, ArrayAccess, Countable
+interface sfDataSourceInterface extends SeekableIterator, ArrayAccess, Countable, sfDataSourceFilterableInterface
 {
   const ASC  = 'asc';
   const DESC = 'desc';
@@ -98,20 +98,6 @@ interface sfDataSourceInterface extends SeekableIterator, ArrayAccess, Countable
    *                        sfDataSourceInterface::ASC and sfDataSourceInterface::DESC
    */
   public function setSort($column, $order = sfDataSourceInterface::ASC);
-
-  /**
-   * 
-   * // TODO: remove Criteria dependancy
-   * 
-   * 
-   * An associative array of field-names with an associative array of value/operator-pairs
-   * array(field => array('value' => $value, 'operator' => $operator))
-   *
-   * field names can match column-names but the implementation is up to you.
-   *
-   * @param array[array[string, string]] $columns
-   */
-  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL);
 
   /**
    * Sets the number of rows to skip in the beginning of the data source when

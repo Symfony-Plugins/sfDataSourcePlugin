@@ -158,7 +158,10 @@ class sfDataSourcePropel extends sfDataSource
     foreach ($accessors as $accessor)
     {
       $method = 'get'.$accessor; //TODO: maybe move to sfPropelObjectPathBehaviorPlugin? object->getValueByPropertyPath($field)...
-      $obj = $obj->$method();
+      if ($obj)
+      {
+        $obj = $obj->$method();
+      }
     }
     
     return $obj;
