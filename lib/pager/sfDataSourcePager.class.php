@@ -122,13 +122,13 @@ class sfDataSourcePager implements Iterator
     {
       throw new DomainException(sprintf('The maximum amount of records per page (%s) must be 0 or greater', $amount));
     }
-
+    /*
     if (isset($this->page))
     {
       throw new Exception('You should call setMaxPerPage directly after the construction of the page object,
                            or at least before setting the current page');
     }
-
+    */
     $this->maxPerPage = $amount;
     $this->source->setLimit($amount);
 
