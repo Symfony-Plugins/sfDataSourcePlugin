@@ -353,7 +353,17 @@ class sfDataSourceDoctrine extends sfDataSource
   {
     if ($this->query)
     {
-      return Doctrine::getTable($this->query->getRootAlias());
+      // we need to know the base table of the query
+      // ...may be there are aliases and another elements,
+      // only the first position we need for
+      $from = $this->query->getDqlPart('from');
+      $from = $from[0];
+      $length = strpos($from, ' ');
+      // if we have an alias
+      if ($length !== false)
+        $from = substr($from, 0, $length);
+
+      return Doctrine::getTable($from);
     }
     else
     {
