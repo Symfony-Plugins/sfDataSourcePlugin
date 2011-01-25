@@ -336,12 +336,24 @@ class sfDataSourceDoctrine extends sfDataSource
   /**
    * @see sfDataSourceInterface
    */
-  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL, $group_operator = sfDataSource::GROUP_AND)
   {
     $this->requireColumn($column);
 
     $expr = $column.' '.$comparison.' ?';
-    return $this->query->addWhereProperyPath($expr, $value);
+
+    if ($group_operator == sfDataSource::GROUP_AND)
+    {
+      return $this->query->addWhereProperyPath($expr, $value);
+    }
+    elseif ($group_operator == sfDataSource::GROUP_OR)
+    {
+      return $this->query->orWhereProperyPath($expr, $value);
+    }
+    else
+    {
+      throw new InvalidArgumentException(sprintf("The group operator '%s' is not valid.", $group_operator));
+    }
   }
 
   /**

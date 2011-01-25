@@ -90,6 +90,18 @@ interface sfDataSourceInterface extends SeekableIterator, ArrayAccess, Countable
   /** Comparison type. */
   const NOT_LIKE = " NOT LIKE ";
 
+  /** Comparison type. */
+  const IN = "IN";
+
+  /** Comparison type. */
+  const NOT_IN = "NOT IN";
+
+  /** Join comparison type */
+  const GROUP_AND = "AND";
+
+  /** Join comparison type */
+  const GROUP_OR = "OR";
+
   /**
    * Sorts the data source by the given column in the given order.
    *
