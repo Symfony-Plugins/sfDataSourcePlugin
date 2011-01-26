@@ -223,7 +223,7 @@ class sfDataSourceArray extends sfDataSource
   /**
    * @see sfDataSourceInterface
    */
-  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL)
+  public function addFilter($column, $value, $comparison = sfDataSource::EQUAL, $group_operator = sfDataSource::GROUP_AND)
   {
     // TODO: because of this, you should first Filter before you sort!
     // TODO: possibly add sortState (asc,desc, none (per field)), and sort after filtering
